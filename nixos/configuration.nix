@@ -78,6 +78,7 @@
   services.k3s = {
     enable = true;
     role = "server";
+    package = pkgs.k3s_1_36;
   };
 
   # Open ports in the firewall.
