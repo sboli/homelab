@@ -103,7 +103,7 @@
      nameservers = [ "1.1.1.1" "9.9.9.9" ];
   };
 
-  fileSystems."/mnt/media" = {
+  fileSystems."/mnt/bigdata" = {
     device = "192.168.1.201:/volume1/media";
     fsType = "nfs";
     options = [ "nofail" "x-systemd.automount" ];
