@@ -4,7 +4,23 @@ metadata:
   name: blackbox-lan
 spec:
   addresses:
-    - 192.168.1.210-192.168.1.240
+    - 192.168.1.211-192.168.1.240
+---
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: blackbox-traefik
+spec:
+  addresses:
+    - 192.168.1.210/32
+  autoAssign: false
+  serviceAllocation:
+    namespaces:
+      - kube-system
+    serviceSelectors:
+      - matchLabels:
+          app.kubernetes.io/name: traefik
+          app.kubernetes.io/instance: traefik-kube-system
 ---
 apiVersion: metallb.io/v1beta1
 kind: L2Advertisement
@@ -13,3 +29,4 @@ metadata:
 spec:
   ipAddressPools:
     - blackbox-lan
+    - blackbox-traefik
