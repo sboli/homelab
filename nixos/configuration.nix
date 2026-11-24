@@ -84,6 +84,7 @@
     enable = true;
     role = "server";
     package = pkgs.k3s_1_36;
+    disable = [ "servicelb" ];
     extraFlags = [
       "--write-kubeconfig-mode=0640"
       "--write-kubeconfig-group=k3s-admins"
