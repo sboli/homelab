@@ -103,6 +103,12 @@
      nameservers = [ "1.1.1.1" "9.9.9.9" ];
   };
 
+  fileSystems."/mnt/media" = {
+    device = "192.168.1.201:/volume1/media";
+    fsType = "nfs";
+    options = [ "nofail" "x-systemd.automount" ];
+  };
+
   # Copy the NixOS configuration file and link it from the resulting system
   # (/run/current-system/configuration.nix). This is useful in case you
   # accidentally delete configuration.nix.
