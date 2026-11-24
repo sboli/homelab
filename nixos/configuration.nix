@@ -39,11 +39,13 @@
   # Configure console keymap
   console.keyMap = "fr";
 
+  users.groups.k3s-admins = { };
+
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users."boli" = {
     isNormalUser = true;
     description = "boli";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "k3s-admins" ];
     packages = with pkgs; [];
     openssh.authorizedKeys.keys = [
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPRPrtAUlgjacsSDKV6/YWQ9wGnCHwF/OxYD8hs5VG3f"
@@ -80,6 +82,10 @@
     enable = true;
     role = "server";
     package = pkgs.k3s_1_36;
+    extraFlags = [
+      "--write-kubeconfig-mode=0640"
+      "--write-kubeconfig-group=k3s-admins"
+    ];
   };
 
   # Open ports in the firewall.
