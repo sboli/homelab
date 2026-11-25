@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NetworkConfiguration>
+  <EnableRemoteAccess>false</EnableRemoteAccess>
+  <EnableUPnP>false</EnableUPnP>
+  <AutoDiscovery>false</AutoDiscovery>
+  <LocalNetworkSubnets>
+    <string>192.168.1.0/24</string>
+    <string>10.42.0.0/24</string>
+  </LocalNetworkSubnets>
+  <KnownProxies>
+    <string>10.42.0.0/24</string>
+  </KnownProxies>
+</NetworkConfiguration>

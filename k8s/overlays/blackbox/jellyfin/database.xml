@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DatabaseConfigurationOptions>
+  <DatabaseType>Jellyfin-SQLite</DatabaseType>
+  <LockingBehavior>Pessimistic</LockingBehavior>
+  <CustomProviderOptions>
+    <Options>
+      <CustomDatabaseOption>
+        <Key>#PRAGMA:journal_mode</Key>
+        <Value>DELETE</Value>
+      </CustomDatabaseOption>
+      <CustomDatabaseOption>
+        <Key>syncmode</Key>
+        <Value>2</Value>
+      </CustomDatabaseOption>
+    </Options>
+  </CustomProviderOptions>
+</DatabaseConfigurationOptions>

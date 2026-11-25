@@ -1,0 +1,18 @@
+{
+  "adminUsername": "boli",
+  "server": {
+    "ServerName": "Jellyfin",
+    "UICulture": "en-US",
+    "PreferredMetadataLanguage": "en",
+    "MetadataCountryCode": "US"
+  },
+  "libraryOptions": {
+    "EnableRealtimeMonitor": false,
+    "SaveLocalMetadata": false,
+    "SaveSubtitlesWithMedia": false
+  },
+  "libraries": [
+    { "name": "Movies", "type": "movies", "paths": ["/media/movies"] },
+    { "name": "TV Shows", "type": "tvshows", "paths": ["/media/tv_shows"] }
+  ]
+}

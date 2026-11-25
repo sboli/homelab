@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: blackbox-jellyfin-nfs
+spec:
+  capacity:
+    storage: 50Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ""
+  persistentVolumeReclaimPolicy: Retain
+  claimRef:
+    namespace: homelab
+    name: jellyfin-data-nfs
+  nfs:
+    server: 192.168.1.201
+    path: /volume1/media/pvcs/jellyfin
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jellyfin-data-nfs
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ""
+  volumeName: blackbox-jellyfin-nfs
+  resources:
+    requests:
+      storage: 50Gi

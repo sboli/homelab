@@ -51,3 +51,25 @@ Read the admin password from its Kubernetes Secret.
 kubectl -n homelab get secret pihole -o jsonpath='{.data.web-password}' | base64 -d
 printf '\n'
 ```
+
+## Jellyfin
+
+Jellyfin is available at `http://jellyfin.home.stephenbolivar.com/`. The [Jellyfin overlay](overlays/blackbox/jellyfin/) manages storage, ingress, network settings, and SQLite settings. On startup Jellyfin reconciles the server settings and named libraries in `settings.json`. The initial administrator is `boli` and the Movies and TV Shows folders are mounted read-only. Newly added media is discovered by Jellyfin's scheduled scans.
+
+The database, user accounts, watch history, and cache live on the NAS under `/mnt/bigdata/pvcs/jellyfin`. The deployment runs one replica and configures SQLite rollback journaling for NFS. Jellyfin recommends local storage for its SQLite database.
+
+On a fresh `blackbox` cluster, create the NAS directory and admin secret before applying the overlay. Run these commands from the repo root.
+
+```sh
+mkdir -p -m 0700 /mnt/bigdata/pvcs/jellyfin
+kubectl apply --server-side --field-manager=homelab -f k8s/base/namespace.yaml
+od -An -N24 -tx1 /dev/urandom | tr -d '[:space:]' | \
+  kubectl -n homelab create secret generic jellyfin-admin --from-file=password=/dev/stdin
+```
+
+Retrieve the password on `blackbox`. Keep the Secret and Jellyfin administrator password in sync so the startup configuration can authenticate on later restarts.
+
+```sh
+kubectl -n homelab get secret jellyfin-admin -o jsonpath='{.data.password}' | base64 -d
+printf '\n'
+```
