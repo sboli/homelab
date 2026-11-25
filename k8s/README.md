@@ -77,3 +77,22 @@ printf '\n'
 ## Homepage
 
 The dashboard is available at `http://homepage.home.stephenbolivar.com/`. Edit [services.yaml](overlays/blackbox/homepage/services.yaml) to add links and health checks, and [settings.yaml](overlays/blackbox/homepage/settings.yaml) to change the layout. Applying the `blackbox` overlay rolls out changes to these files. Homepage uses a memory-backed volume for its runtime configuration.
+
+## qBittorrent
+
+Sign in as `boli` at `http://qbittorrent.home.stephenbolivar.com/`. The [qBittorrent overlay](overlays/blackbox/qbittorrent/) uses host networking and enables UPnP/NAT-PMP for peer traffic on `192.168.1.200:51413` over TCP and UDP. The web UI uses port `8089` behind Traefik and has its own UPnP mapping disabled.
+
+Config and resume data live under `/mnt/bigdata/pvcs/qbittorrent`. The default download directory is `/mnt/bigdata/media/downloads` on the NAS. On a fresh cluster, create the config directory on `blackbox` and apply the namespace manifest first.
+
+```sh
+mkdir -p -m 0700 /mnt/bigdata/pvcs/qbittorrent
+kubectl apply --server-side --field-manager=homelab -f k8s/base/namespace.yaml
+```
+
+From the Mac at the repo root, enter the web password to create the hash Secret, then apply the overlay on `blackbox`.
+
+```sh
+python3 k8s/overlays/blackbox/qbittorrent/password.py | \
+  ssh boli@192.168.1.200 \
+    'kubectl -n homelab create secret generic qbittorrent-webui --from-file=password-hash=/dev/stdin'
+```

@@ -9,3 +9,4 @@ resources:
   - pihole.yaml
   - jellyfin
   - homepage
+  - qbittorrent

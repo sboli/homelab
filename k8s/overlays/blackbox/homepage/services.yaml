@@ -7,3 +7,7 @@
         icon: pi-hole.png
         href: http://pihole.home.stephenbolivar.com/admin/
         siteMonitor: http://pihole-web.homelab.svc.cluster.local/admin/
+    - qBittorrent:
+        icon: qbittorrent.png
+        href: http://qbittorrent.home.stephenbolivar.com/
+        siteMonitor: http://qbittorrent.homelab.svc.cluster.local:8089/

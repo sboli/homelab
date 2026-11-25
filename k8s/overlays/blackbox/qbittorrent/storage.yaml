@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: blackbox-qbittorrent-nfs
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ""
+  persistentVolumeReclaimPolicy: Retain
+  claimRef:
+    namespace: homelab
+    name: qbittorrent-config-nfs
+  nfs:
+    server: 192.168.1.201
+    path: /volume1/media/pvcs/qbittorrent
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: qbittorrent-config-nfs
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ""
+  volumeName: blackbox-qbittorrent-nfs
+  resources:
+    requests:
+      storage: 5Gi
