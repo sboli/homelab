@@ -8,6 +8,7 @@ resources:
   - pihole-storage.yaml
   - pihole.yaml
   - intel-gpu-plugin.yaml
+  - cloudflared.yaml
   - jellyfin
   - homepage
   - qbittorrent

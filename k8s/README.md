@@ -16,6 +16,22 @@ git -C "$HOME/pgit/homelab" pull --ff-only &&
     -k "$HOME/pgit/homelab/k8s/overlays/blackbox"
 ```
 
+## Cloudflare Tunnel
+
+The `cloudflared` deployment on `blackbox` uses a remotely managed tunnel. Its application routes are configured in the Cloudflare dashboard. On a fresh cluster, create the `homelab` namespace and provide the tunnel token from an SSH session on `blackbox` before applying the overlay.
+
+```bash
+read -rsp 'Tunnel token: ' tunnel_token
+printf '\n'
+printf '%s' "$tunnel_token" |
+  kubectl -n homelab create secret generic cloudflared-tunnel \
+    --from-file=token=/dev/stdin --dry-run=client -o yaml |
+  kubectl apply --server-side --field-manager=homelab-secrets -f -
+unset tunnel_token
+```
+
+After rotating the token in Cloudflare and updating the Secret, run `kubectl -n homelab rollout restart deployment/cloudflared`. Use `kubectl -n homelab rollout status deployment/cloudflared` to verify connector readiness.
+
 ## MetalLB
 
 MetalLB reserves `192.168.1.210` for Traefik and automatically assigns `192.168.1.211` through `192.168.1.240` to other `LoadBalancer` services. On a fresh `blackbox` installation, run `nixos/rebuild.sh` to disable K3s ServiceLB before installing MetalLB.
