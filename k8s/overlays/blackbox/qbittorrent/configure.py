@@ -18,7 +18,7 @@ desired = read_settings("/desired/settings.ini")
 password_hash = Path("/credentials/password-hash").read_text().strip()
 if not password_hash:
     raise RuntimeError("qBittorrent password hash is empty")
-desired["Preferences"][r"WebUI\Password_PBKDF2"] = f"@ByteArray({password_hash})"
+desired["WebUI"]["Password_PBKDF2"] = f"@ByteArray({password_hash})"
 
 for section in desired.sections():
     if not current.has_section(section):
