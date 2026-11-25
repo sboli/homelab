@@ -1,0 +1,8 @@
+title: Homelab
+theme: dark
+color: slate
+statusStyle: basic
+layout:
+  Services:
+    style: row
+    columns: 2

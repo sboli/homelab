@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: homepage
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: homepage
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: homepage
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+        - name: install-config
+          image: ghcr.io/gethomepage/homepage:v2.8.0
+          command: ["/bin/sh", "-ec", "cp /desired/*.yaml /app/config/"]
+          volumeMounts:
+            - name: desired-config
+              mountPath: /desired
+              readOnly: true
+            - name: config
+              mountPath: /app/config
+      containers:
+        - name: homepage
+          image: ghcr.io/gethomepage/homepage:v2.8.0
+          env:
+            - name: HOMEPAGE_ALLOWED_HOSTS
+              value: homepage.home.stephenbolivar.com
+            - name: HOSTNAME
+              value: "0.0.0.0"
+          ports:
+            - name: http
+              containerPort: 3000
+          readinessProbe:
+            httpGet:
+              path: /api/healthcheck
+              port: http
+              httpHeaders:
+                - name: Host
+                  value: homepage.home.stephenbolivar.com
+          volumeMounts:
+            - name: config
+              mountPath: /app/config
+      volumes:
+        - name: desired-config
+          configMap:
+            name: homepage-config
+        - name: config
+          emptyDir:
+            medium: Memory

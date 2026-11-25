@@ -1,0 +1,9 @@
+- Services:
+    - Jellyfin:
+        icon: jellyfin.png
+        href: http://jellyfin.home.stephenbolivar.com/
+        siteMonitor: http://jellyfin.homelab.svc.cluster.local:8096/health
+    - Pi-hole:
+        icon: pi-hole.png
+        href: http://pihole.home.stephenbolivar.com/admin/
+        siteMonitor: http://pihole-web.homelab.svc.cluster.local/admin/

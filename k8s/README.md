@@ -73,3 +73,7 @@ Retrieve the password on `blackbox`. Keep the Secret and Jellyfin administrator 
 kubectl -n homelab get secret jellyfin-admin -o jsonpath='{.data.password}' | base64 -d
 printf '\n'
 ```
+
+## Homepage
+
+The dashboard is available at `http://homepage.home.stephenbolivar.com/`. Edit [services.yaml](overlays/blackbox/homepage/services.yaml) to add links and health checks, and [settings.yaml](overlays/blackbox/homepage/settings.yaml) to change the layout. Applying the `blackbox` overlay rolls out changes to these files. Homepage uses a memory-backed volume for its runtime configuration.
