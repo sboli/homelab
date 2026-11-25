@@ -7,6 +7,7 @@ resources:
   - ../../base
   - pihole-storage.yaml
   - pihole.yaml
+  - intel-gpu-plugin.yaml
   - jellyfin
   - homepage
   - qbittorrent

@@ -14,6 +14,8 @@ LOG = logging.getLogger("Unmanic.homelab_x265")
 MIN_AGE = 86400
 MAX_INPUT_SIZE = 24 * 1024 ** 3
 MIN_SAVINGS_PERCENT = 15
+QSV_QUALITY = 20
+QSV_PRESET = "slow"
 STATE = Path("/config/.unmanic/userdata/homelab_x265")
 
 
@@ -33,7 +35,7 @@ def fingerprint(path):
 
 
 def reject_marker(path, source_state):
-    identity = repr((str(path), source_state, "crf21-medium"))
+    identity = repr((str(path), source_state, "hevc_qsv", QSV_QUALITY, QSV_PRESET))
     return STATE / hashlib.sha256(identity.encode()).hexdigest()
 
 
@@ -69,10 +71,12 @@ def eligible(path, source_state):
 
 def ffmpeg_args(source, output):
     args = [
-        "ffmpeg", "-nostdin", "-hide_banner", "-xerror", "-n", "-i", str(source),
+        "ffmpeg", "-nostdin", "-hide_banner", "-xerror", "-n",
+        "-init_hw_device", "qsv=intel:hw,child_device=/dev/dri/renderD128",
+        "-hwaccel", "qsv", "-hwaccel_device", "intel", "-hwaccel_output_format", "qsv", "-i", str(source),
         "-map", "0", "-map_metadata", "0", "-map_chapters", "0", "-c", "copy",
-        "-c:v:0", "libx265", "-preset", "medium", "-crf", "21",
-        "-x265-params", "pools=2:frame-threads=2", "-pix_fmt", "yuv420p", "-fps_mode:v:0", "passthrough",
+        "-c:v:0", "hevc_qsv", "-preset", QSV_PRESET, "-global_quality", str(QSV_QUALITY),
+        "-fps_mode:v:0", "passthrough",
     ]
     if source.suffix.lower() == ".mp4":
         args.extend(["-tag:v:0", "hvc1", "-movflags", "+faststart"])
@@ -110,7 +114,7 @@ def on_worker_process(data, task_data_store=None):
     source = Path(data["file_in"])
     source_state = fingerprint(source)
     if not eligible(source, source_state):
-        raise ValueError("Source no longer matches the x265 profile")
+        raise ValueError("Source no longer matches the Intel Quick Sync profile")
     task_data_store.set_task_state("source_state", source_state)
     data["exec_command"] = ffmpeg_args(source, Path(data["file_out"]))
 
@@ -147,7 +151,7 @@ def on_postprocessor_file_movement(data, task_data_store=None):
         if temporary.stat().st_size != output.stat().st_size or fingerprint(source) != source_state:
             raise OSError("Source changed or staged output size differed")
         os.replace(temporary, source)
-        LOG.info("Replaced verified source with x265 output: %s", source)
+        LOG.info("Replaced verified source with HEVC output: %s", source)
     except OSError:
         LOG.exception("Could not replace source: %s", source)
     finally:

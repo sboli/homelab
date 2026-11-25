@@ -13,10 +13,10 @@ from unmanic.service import init_db
 
 plugin = {
     "id": "homelab_x265",
-    "name": "Homelab x265",
-    "description": "Encode eligible H.264 videos and replace them atomically after verification.",
+    "name": "Homelab Intel Quick Sync",
+    "description": "Encode eligible H.264 videos to HEVC with Intel Quick Sync and replace them atomically after verification.",
     "author": "Homelab",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "tags": "video,hevc",
     "icon": "",
     "compatibility": [2],
@@ -59,7 +59,8 @@ try:
         record.save()
         Library(library_id).set_enabled_plugins([{"plugin_id": plugin["id"]}])
 
-    workers, _ = WorkerGroups.get_or_create(id=1, defaults={"name": "x265", "number_of_workers": 0})
+    workers, _ = WorkerGroups.get_or_create(id=1, defaults={"name": "Intel Quick Sync", "number_of_workers": 0})
+    workers.name = "Intel Quick Sync"
     workers.number_of_workers = 1
     workers.save()
 finally:

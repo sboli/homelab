@@ -104,6 +104,11 @@ def configure():
         if any(current.get(key) != value for key, value in settings["server"].items()):
             api("POST", "/System/Configuration", current | settings["server"], token=token)
 
+        encoding_path = "/System/Configuration/encoding"
+        current_encoding = api("GET", encoding_path, token=token)
+        if any(current_encoding.get(key) != value for key, value in settings["transcoding"].items()):
+            api("POST", encoding_path, current_encoding | settings["transcoding"], token=token)
+
         folders = {folder["Name"]: folder for folder in api("GET", LIBRARIES, token=token)}
         changed = [
             configure_library(library, folders.get(library["name"]), settings["libraryOptions"], token)

@@ -118,6 +118,8 @@ The [media overlay](overlays/blackbox/media/) stores app config and PostgreSQL d
 
 ## Unmanic
 
-Open Unmanic from Homepage. It scans the Jellyfin Movies and TV Shows folders at startup and daily, with one CPU encode at a time. The profile uses software x265 at CRF 21 with the medium preset. It selects progressive 8-bit SDR H.264 in MKV or MP4 up to 1080p and skips low-bitrate files, files over 24 GiB, files less than a day old, and hard-linked files. Audio, subtitles, chapters, and the container are preserved. It replaces a source atomically only after verifying streams and duration and saving at least 15%.
+Open Unmanic from Homepage. It scans the Jellyfin Movies and TV Shows folders at startup and daily, with one Intel Quick Sync encode at a time. The profile encodes HEVC at ICQ 20 with the slow preset. It selects progressive 8-bit SDR H.264 in MKV or MP4 up to 1080p and skips low-bitrate files, files over 24 GiB, files less than a day old, and hard-linked files. Audio, subtitles, chapters, and the container are preserved. It replaces a source atomically only after verifying streams and duration and saving at least 15%.
 
 Unmanic keeps its state under `/mnt/bigdata/pvcs/unmanic` and uses temporary local storage for encodes. On a fresh cluster, run `mkdir -p -m 0775 /mnt/bigdata/pvcs/unmanic` on `blackbox` before applying the overlay. To pause the encoder, pause the worker in Unmanic. Worker and scanner settings are reapplied when the pod starts.
+
+The Intel GPU device plugin exposes two allocations of blackbox's integrated GPU so Jellyfin can use Quick Sync for playback transcoding while Unmanic is encoding.
