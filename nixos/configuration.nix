@@ -121,6 +121,8 @@
 
   systemd.tmpfiles.rules = [
     "d /mnt/downloads 0775 1024 100 -"
+    "d /mnt/downloads/radarr 0775 1024 100 -"
+    "d /mnt/downloads/sonarr 0775 1024 100 -"
   ];
 
   # Copy the NixOS configuration file and link it from the resulting system
