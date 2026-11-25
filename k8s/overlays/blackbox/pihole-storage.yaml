@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: blackbox-pihole-nfs
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ""
+  persistentVolumeReclaimPolicy: Retain
+  claimRef:
+    namespace: homelab
+    name: pihole-data-nfs
+  nfs:
+    server: 192.168.1.201
+    path: /volume1/media/pvcs/pihole
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pihole-data-nfs
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ""
+  volumeName: blackbox-pihole-nfs
+  resources:
+    requests:
+      storage: 1Gi

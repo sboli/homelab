@@ -5,4 +5,5 @@ namespace: homelab
 
 resources:
   - ../../base
+  - pihole-storage.yaml
   - pihole.yaml

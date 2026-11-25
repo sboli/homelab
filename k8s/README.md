@@ -34,9 +34,12 @@ kubectl apply --server-side --field-manager=homelab -k k8s/infrastructure/metall
 
 Pi-hole uses the host network to serve DNS over TCP and UDP at `192.168.1.200:53`. Its admin UI is available through Traefik at `http://pihole.home.stephenbolivar.com/admin/`.
 
-For a fresh cluster, create the `homelab` namespace and generate the admin password before applying the overlay. Run these commands from the repo root on `blackbox`.
+Pi-hole stores `/etc/pihole` in `/mnt/bigdata/pvcs/pihole`. The persistent volume mounts `192.168.1.201:/volume1/media/pvcs/pihole` directly and retains the data if the claim is deleted. Pi-hole uses SQLite rollback journaling on NFS and runs with the UID and GID used by the NAS export.
+
+For a fresh cluster, create the data directory on the mounted NAS, then create the `homelab` namespace and generate the admin password before applying the overlay. Run these commands from the repo root on `blackbox`.
 
 ```sh
+mkdir -p -m 0700 /mnt/bigdata/pvcs/pihole
 kubectl apply --server-side --field-manager=homelab -f k8s/base/namespace.yaml
 od -An -N24 -tx1 /dev/urandom | tr -d '[:space:]' | \
   kubectl -n homelab create secret generic pihole --from-file=web-password=/dev/stdin
