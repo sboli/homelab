@@ -82,7 +82,7 @@ The dashboard is available at `http://homepage.home.stephenbolivar.com/`. Edit [
 
 Sign in as `boli` at `http://qbittorrent.home.stephenbolivar.com/`. The [qBittorrent overlay](overlays/blackbox/qbittorrent/) uses host networking and enables UPnP/NAT-PMP for peer traffic on `192.168.1.200:51413` over TCP and UDP. The web UI uses port `8089` behind Traefik and has its own UPnP mapping disabled.
 
-Config and resume data live under `/mnt/bigdata/pvcs/qbittorrent`. The default download directory is `/mnt/downloads`, backed by `/mnt/bigdata/media/downloads` on the NAS. Existing torrents can still use their saved `/downloads` paths inside the container.
+Config and resume data live under `/mnt/bigdata/pvcs/qbittorrent`. Downloads go to `/mnt/downloads` on `blackbox`'s local disk. The NixOS configuration creates that directory, and the pod mounts it at the same path.
 
 qBittorrent loads [David Moore's IP filter](https://github.com/DavidMoore/ipfilter/releases/tag/lists) for peers. The init container refreshes the list when the pod starts and falls back to its previous NAS copy if the download fails.
 

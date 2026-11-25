@@ -120,7 +120,7 @@
   };
 
   systemd.tmpfiles.rules = [
-    "L /mnt/downloads - - - - /mnt/bigdata/media/downloads"
+    "d /mnt/downloads 0775 1024 100 -"
   ];
 
   # Copy the NixOS configuration file and link it from the resulting system
