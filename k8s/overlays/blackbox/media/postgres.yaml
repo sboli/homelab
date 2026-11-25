@@ -1,0 +1,88 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: media-postgres
+spec:
+  selector:
+    app.kubernetes.io/name: media-postgres
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: postgres
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: media-postgres
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: media-postgres
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: media-postgres
+    spec:
+      automountServiceAccountToken: false
+      nodeSelector:
+        kubernetes.io/hostname: blackbox
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1024
+        runAsGroup: 100
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: postgres
+          image: postgres:17-alpine@sha256:f9cf3e1f0066f0eb0c48707d864f0ac5941e9ff454a072077d97a4d278d07d73
+          env:
+            - name: PGDATA
+              value: /state/pgdata
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: media-stack
+                  key: postgres-password
+            - name: PROWLARR_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: media-stack
+                  key: prowlarr-db
+            - name: RADARR_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: media-stack
+                  key: radarr-db
+            - name: SONARR_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: media-stack
+                  key: sonarr-db
+            - name: SEERR_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: media-stack
+                  key: seerr-db
+          ports:
+            - name: postgres
+              containerPort: 5432
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-h", "127.0.0.1", "-U", "postgres", "-d", "postgres"]
+          volumeMounts:
+            - name: state
+              mountPath: /state
+              subPath: postgres
+            - name: init
+              mountPath: /docker-entrypoint-initdb.d
+              readOnly: true
+      volumes:
+        - name: state
+          persistentVolumeClaim:
+            claimName: media-stack-nfs
+        - name: init
+          configMap:
+            name: media-postgres-config

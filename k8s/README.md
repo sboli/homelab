@@ -80,7 +80,7 @@ The dashboard is available at `http://homepage.home.stephenbolivar.com/`. Edit [
 
 ## qBittorrent
 
-Sign in as `boli` at `http://qbittorrent.home.stephenbolivar.com/`. The [qBittorrent overlay](overlays/blackbox/qbittorrent/) uses host networking and enables UPnP/NAT-PMP for peer traffic on `192.168.1.200:51413` over TCP and UDP. The web UI uses port `8089` behind Traefik and has its own UPnP mapping disabled.
+Sign in as `boli` at `http://qbittorrent.home.stephenbolivar.com/`. The [qBittorrent overlay](overlays/blackbox/qbittorrent/) uses host networking and enables UPnP/NAT-PMP for a random TCP/UDP peer port on `192.168.1.200`. The web UI uses port `8089` behind Traefik and has its own UPnP mapping disabled.
 
 Config and resume data live under `/mnt/bigdata/pvcs/qbittorrent`. Downloads go to `/mnt/downloads` on `blackbox`'s local disk. The NixOS configuration creates that directory, and the pod mounts it at the same path.
 
@@ -100,3 +100,16 @@ python3 k8s/overlays/blackbox/qbittorrent/password.py | \
   ssh boli@192.168.1.200 \
     'kubectl -n homelab create secret generic qbittorrent-webui --from-file=password-hash=/dev/stdin'
 ```
+
+## Media requests and automation
+
+Open Seerr, Prowlarr, Radarr, and Sonarr from Homepage. Seerr uses your Jellyfin credentials. The three Arr apps use the `boli` account and the password in the `media-stack` Secret.
+
+```sh
+kubectl -n homelab get secret media-stack -o jsonpath='{.data.arr-admin-password}' | base64 -d
+printf '\n'
+```
+
+Seerr sends movie requests to Radarr and TV requests to Sonarr. Prowlarr syncs configured indexers to both. Sonarr and Radarr use separate qBittorrent categories under `/mnt/downloads`, import completed files into their respective NAS libraries, and notify Jellyfin to refresh. Add your indexers in Prowlarr.
+
+The [media overlay](overlays/blackbox/media/) stores app config and PostgreSQL data under `/mnt/bigdata/pvcs/media-stack`. On a fresh cluster, create the namespace and run `sh k8s/overlays/blackbox/media/prepare.sh` on `blackbox` before applying the overlay. The script provisions the database credentials and the qBittorrent API key in Kubernetes Secrets.

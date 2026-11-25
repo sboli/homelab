@@ -1,0 +1,24 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - storage.yaml
+  - postgres.yaml
+  - prowlarr.yaml
+  - radarr.yaml
+  - sonarr.yaml
+  - seerr.yaml
+  - ingress.yaml
+  - bootstrap.yaml
+
+configMapGenerator:
+  - name: media-postgres-config
+    files:
+      - databases.sql
+  - name: media-arr-config
+    files:
+      - configure-arr.py
+  - name: media-bootstrap-config
+    files:
+      - configure-stack.py
+      - settings.json

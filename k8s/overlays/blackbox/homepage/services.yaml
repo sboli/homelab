@@ -11,3 +11,19 @@
         icon: qbittorrent.png
         href: http://qbittorrent.home.stephenbolivar.com/
         siteMonitor: http://qbittorrent.homelab.svc.cluster.local:8089/
+    - Seerr:
+        icon: jellyseerr.png
+        href: http://seerr.home.stephenbolivar.com/
+        siteMonitor: http://seerr.homelab.svc.cluster.local:5055/api/v1/settings/public
+    - Prowlarr:
+        icon: prowlarr.png
+        href: http://prowlarr.home.stephenbolivar.com/
+        siteMonitor: http://prowlarr.homelab.svc.cluster.local:9696/ping
+    - Radarr:
+        icon: radarr.png
+        href: http://radarr.home.stephenbolivar.com/
+        siteMonitor: http://radarr.homelab.svc.cluster.local:7878/ping
+    - Sonarr:
+        icon: sonarr.png
+        href: http://sonarr.home.stephenbolivar.com/
+        siteMonitor: http://sonarr.homelab.svc.cluster.local:8989/ping

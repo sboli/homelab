@@ -10,3 +10,4 @@ resources:
   - jellyfin
   - homepage
   - qbittorrent
+  - media

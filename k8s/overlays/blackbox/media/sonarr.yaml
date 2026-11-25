@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sonarr
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sonarr
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: sonarr
+    spec:
+      automountServiceAccountToken: false
+      nodeSelector:
+        kubernetes.io/hostname: blackbox
+      initContainers:
+        - name: install-config
+          image: python:3.13-alpine@sha256:9ef1a599f863231c3d91e941389bfdc4a2d6070557243d54df1a4e57015b960e
+          command: ["python", "/desired/configure-arr.py"]
+          env:
+            - name: ARR_APP
+              value: sonarr
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1024
+            runAsGroup: 100
+          volumeMounts:
+            - name: config
+              mountPath: /config
+              subPath: sonarr
+            - name: desired-config
+              mountPath: /desired
+              readOnly: true
+            - name: credentials
+              mountPath: /credentials
+              readOnly: true
+      containers:
+        - name: sonarr
+          image: lscr.io/linuxserver/sonarr:4.0.20.3014-ls6
+          env:
+            - name: PUID
+              value: "1024"
+            - name: PGID
+              value: "100"
+            - name: TZ
+              value: America/Guadeloupe
+          ports:
+            - name: http
+              containerPort: 8989
+          readinessProbe:
+            httpGet:
+              path: /ping
+              port: http
+          volumeMounts:
+            - name: config
+              mountPath: /config
+              subPath: sonarr
+            - name: downloads
+              mountPath: /mnt/downloads
+            - name: library
+              mountPath: /media/tv_shows
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: media-stack-nfs
+        - name: desired-config
+          configMap:
+            name: media-arr-config
+        - name: credentials
+          secret:
+            secretName: media-stack
+            items:
+              - key: sonarr-api-key
+                path: api-key
+              - key: sonarr-db
+                path: db-password
+        - name: downloads
+          hostPath:
+            path: /mnt/downloads
+            type: Directory
+        - name: library
+          nfs:
+            server: 192.168.1.201
+            path: /volume1/media/media/tv_shows

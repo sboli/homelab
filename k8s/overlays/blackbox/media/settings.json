@@ -1,0 +1,19 @@
+{
+  "username": "boli",
+  "jellyfinLibraries": ["Movies", "TV Shows"],
+  "applications": {
+    "radarr": {
+      "port": 7878,
+      "root": "/media/movies",
+      "category": "radarr",
+      "categoryField": "movieCategory"
+    },
+    "sonarr": {
+      "port": 8989,
+      "root": "/media/tv_shows",
+      "category": "sonarr",
+      "categoryField": "tvCategory"
+    }
+  },
+  "qualityProfiles": ["HD-1080p", "HD - 720p/1080p", "Any"]
+}

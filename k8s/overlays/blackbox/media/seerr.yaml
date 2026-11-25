@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: seerr
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: seerr
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: seerr
+    spec:
+      automountServiceAccountToken: false
+      nodeSelector:
+        kubernetes.io/hostname: blackbox
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1024
+        runAsGroup: 100
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: seerr
+          image: ghcr.io/seerr-team/seerr:v3.5.2
+          env:
+            - name: TZ
+              value: America/Guadeloupe
+            - name: DB_TYPE
+              value: postgres
+            - name: DB_HOST
+              value: media-postgres.homelab.svc.cluster.local
+            - name: DB_NAME
+              value: seerr
+            - name: DB_USER
+              value: seerr
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: media-stack
+                  key: seerr-db
+          ports:
+            - name: http
+              containerPort: 5055
+          readinessProbe:
+            httpGet:
+              path: /api/v1/settings/public
+              port: http
+          volumeMounts:
+            - name: config
+              mountPath: /app/config
+              subPath: seerr
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: media-stack-nfs

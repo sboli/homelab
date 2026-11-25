@@ -47,6 +47,9 @@ password_hash = Path("/credentials/password-hash").read_text().strip()
 if not password_hash:
     raise RuntimeError("qBittorrent password hash is empty")
 desired["WebUI"]["Password_PBKDF2"] = f"@ByteArray({password_hash})"
+integration_key = Path("/integration/api-key")
+if integration_key.is_file():
+    desired["WebUI"]["APIKey"] = integration_key.read_text().strip()
 
 for section in desired.sections():
     if not current.has_section(section):

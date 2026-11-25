@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: blackbox-media-stack-nfs
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ""
+  persistentVolumeReclaimPolicy: Retain
+  mountOptions:
+    - hard
+  claimRef:
+    namespace: homelab
+    name: media-stack-nfs
+  nfs:
+    server: 192.168.1.201
+    path: /volume1/media/pvcs/media-stack
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: media-stack-nfs
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ""
+  volumeName: blackbox-media-stack-nfs
+  resources:
+    requests:
+      storage: 20Gi
