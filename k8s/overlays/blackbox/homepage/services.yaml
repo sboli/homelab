@@ -27,3 +27,7 @@
         icon: sonarr.png
         href: http://sonarr.home.stephenbolivar.com/
         siteMonitor: http://sonarr.homelab.svc.cluster.local:8989/ping
+    - Unmanic:
+        icon: unmanic.png
+        href: http://unmanic.home.stephenbolivar.com/
+        siteMonitor: http://unmanic.homelab.svc.cluster.local:8888/

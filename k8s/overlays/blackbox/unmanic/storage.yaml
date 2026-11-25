@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: blackbox-unmanic-nfs
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes: [ReadWriteOnce]
+  storageClassName: ""
+  persistentVolumeReclaimPolicy: Retain
+  mountOptions: [hard]
+  claimRef:
+    namespace: homelab
+    name: unmanic-data-nfs
+  nfs:
+    server: 192.168.1.201
+    path: /volume1/media/pvcs/unmanic
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: unmanic-data-nfs
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: ""
+  volumeName: blackbox-unmanic-nfs
+  resources:
+    requests:
+      storage: 10Gi

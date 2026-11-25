@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: unmanic
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: unmanic
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: unmanic
+    spec:
+      automountServiceAccountToken: false
+      nodeSelector:
+        kubernetes.io/hostname: blackbox
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1024
+        runAsGroup: 100
+        fsGroup: 100
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+        - name: configure
+          image: docker.io/josh5/unmanic:0.4.1@sha256:36a705923193db6b8ca7abd5b57b81a7309d04aedd320ec0ef4e9ac5970be885
+          command: ["/opt/venv/bin/python", "/desired/configure.py"]
+          env:
+            - name: UNMANIC_ENABLE_SCANS
+              value: "true"
+          volumeMounts:
+            - name: state
+              mountPath: /config
+            - name: desired
+              mountPath: /desired
+              readOnly: true
+      containers:
+        - name: unmanic
+          image: docker.io/josh5/unmanic:0.4.1@sha256:36a705923193db6b8ca7abd5b57b81a7309d04aedd320ec0ef4e9ac5970be885
+          command: ["/usr/bin/unmanic"]
+          env:
+            - name: TZ
+              value: America/Guadeloupe
+          ports:
+            - name: http
+              containerPort: 8888
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            requests:
+              cpu: 200m
+              memory: 512Mi
+            limits:
+              cpu: "3"
+              memory: 3Gi
+              ephemeral-storage: 50Gi
+          volumeMounts:
+            - name: state
+              mountPath: /config
+            - name: scratch
+              mountPath: /tmp/unmanic
+            - name: movies
+              mountPath: /media/movies
+            - name: tv-shows
+              mountPath: /media/tv_shows
+      volumes:
+        - name: state
+          persistentVolumeClaim:
+            claimName: unmanic-data-nfs
+        - name: desired
+          configMap:
+            name: unmanic-config
+        - name: scratch
+          emptyDir:
+            sizeLimit: 48Gi
+        - name: movies
+          nfs:
+            server: 192.168.1.201
+            path: /volume1/media/media/movies
+        - name: tv-shows
+          nfs:
+            server: 192.168.1.201
+            path: /volume1/media/media/tv_shows

@@ -115,3 +115,9 @@ Seerr sends movie requests to Radarr and TV requests to Sonarr. Prowlarr syncs c
 Prowlarr uses the `flaresolverr` tag to select indexers for its FlareSolverr proxy. Apply the tag to the indexer in Prowlarr when it requires that proxy. FlareSolverr runs on the cluster network and accepts connections from Prowlarr.
 
 The [media overlay](overlays/blackbox/media/) stores app config and PostgreSQL data under `/mnt/bigdata/pvcs/media-stack`. On a fresh cluster, create the namespace and run `sh k8s/overlays/blackbox/media/prepare.sh` on `blackbox` before applying the overlay. The script provisions the database credentials and the qBittorrent API key in Kubernetes Secrets.
+
+## Unmanic
+
+Open Unmanic from Homepage. It scans the Jellyfin Movies and TV Shows folders at startup and daily, with one CPU encode at a time. The profile uses software x265 at CRF 21 with the medium preset. It selects progressive 8-bit SDR H.264 in MKV or MP4 up to 1080p and skips low-bitrate files, files over 24 GiB, files less than a day old, and hard-linked files. Audio, subtitles, chapters, and the container are preserved. It replaces a source atomically only after verifying streams and duration and saving at least 15%.
+
+Unmanic keeps its state under `/mnt/bigdata/pvcs/unmanic` and uses temporary local storage for encodes. On a fresh cluster, run `mkdir -p -m 0775 /mnt/bigdata/pvcs/unmanic` on `blackbox` before applying the overlay. To pause the encoder, pause the worker in Unmanic. Worker and scanner settings are reapplied when the pod starts.
