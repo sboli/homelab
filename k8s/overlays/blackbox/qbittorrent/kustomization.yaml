@@ -11,3 +11,5 @@ configMapGenerator:
     files:
       - configure.py
       - settings.ini
+    literals:
+      - blocklist-url=https://github.com/DavidMoore/ipfilter/releases/download/lists/ipfilter.dat.gz

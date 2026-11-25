@@ -119,6 +119,10 @@
     options = [ "nofail" "x-systemd.automount" ];
   };
 
+  systemd.tmpfiles.rules = [
+    "L /mnt/downloads - - - - /mnt/bigdata/media/downloads"
+  ];
+
   # Copy the NixOS configuration file and link it from the resulting system
   # (/run/current-system/configuration.nix). This is useful in case you
   # accidentally delete configuration.nix.
