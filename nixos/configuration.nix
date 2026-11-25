@@ -63,6 +63,7 @@
     wget
     htop
     smartmontools
+    intel-gpu-tools
   ];
 
   environment.shellAliases.k = "k3s kubectl";
