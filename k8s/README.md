@@ -112,4 +112,6 @@ printf '\n'
 
 Seerr sends movie requests to Radarr and TV requests to Sonarr. Prowlarr syncs configured indexers to both. Sonarr and Radarr use separate qBittorrent categories under `/mnt/downloads`, import completed files into their respective NAS libraries, and notify Jellyfin to refresh. Add your indexers in Prowlarr.
 
+Prowlarr uses the `flaresolverr` tag to select indexers for its FlareSolverr proxy. Apply the tag to the indexer in Prowlarr when it requires that proxy. FlareSolverr runs on the cluster network and accepts connections from Prowlarr.
+
 The [media overlay](overlays/blackbox/media/) stores app config and PostgreSQL data under `/mnt/bigdata/pvcs/media-stack`. On a fresh cluster, create the namespace and run `sh k8s/overlays/blackbox/media/prepare.sh` on `blackbox` before applying the overlay. The script provisions the database credentials and the qBittorrent API key in Kubernetes Secrets.

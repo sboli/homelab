@@ -5,6 +5,7 @@ resources:
   - storage.yaml
   - postgres.yaml
   - prowlarr.yaml
+  - flaresolverr.yaml
   - radarr.yaml
   - sonarr.yaml
   - seerr.yaml

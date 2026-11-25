@@ -33,7 +33,7 @@ class Service:
         self.cookies = http.cookiejar.CookieJar()
         self.opener = build_opener(HTTPCookieProcessor(self.cookies))
 
-    def request(self, method, path, body=None, *, query=None, form=False):
+    def request(self, method, path, body=None, *, query=None, form=False, timeout=28):
         url = self.url + self.prefix + path
         if query:
             url += "?" + urlencode(query)
@@ -48,7 +48,7 @@ class Service:
                 data = json.dumps(body).encode()
         request = Request(url, data=data, headers=headers, method=method)
         try:
-            with self.opener.open(request, timeout=28) as response:
+            with self.opener.open(request, timeout=timeout) as response:
                 content = response.read()
                 if not content:
                     return None
@@ -86,7 +86,7 @@ def configure_library(app, path):
         app.request("PUT", f"/config/mediamanagement/{options['id']}", options | {"copyUsingHardlinks": False})
 
 
-def configure_provider(app, endpoint, implementation, name, values, **options):
+def configure_provider(app, endpoint, implementation, name, values, *, timeout=28, **options):
     existing = next((item for item in app.request("GET", endpoint) if item["name"] == name), None)
     if existing and existing["implementation"] != implementation:
         raise RuntimeError(f"{app.name}: {name} already uses a different implementation")
@@ -106,9 +106,20 @@ def configure_provider(app, endpoint, implementation, name, values, **options):
     if changed:
         item.update(options, name=name)
         if existing:
-            app.request("PUT", f"{endpoint}/{existing['id']}", item)
+            app.request("PUT", f"{endpoint}/{existing['id']}", item, timeout=timeout)
         else:
-            app.request("POST", endpoint, item)
+            app.request("POST", endpoint, item, timeout=timeout)
+
+
+def configure_flaresolverr(prowlarr):
+    label = "flaresolverr"
+    tag = next((tag for tag in prowlarr.request("GET", "/tag") if tag["label"] == label), None)
+    if tag is None:
+        tag = prowlarr.request("POST", "/tag", {"label": label})
+    # Prowlarr runs browser checks before saving the proxy.
+    configure_provider(prowlarr, "/indexerProxy", "FlareSolverr", "FlareSolverr", {
+        "host": f"http://{service_host('flaresolverr')}:8191",
+    }, timeout=180, tags=[tag["id"]])
 
 
 def jellyfin_api_key():
@@ -236,6 +247,7 @@ def configure():
         }, onDownload=True, onUpgrade=True)
     configure_download_clients(applications)
     configure_seerr(applications)
+    configure_flaresolverr(prowlarr)
     print("Prowlarr, Sonarr, Radarr, Seerr and Jellyfin are linked.")
 
 
