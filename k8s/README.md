@@ -29,3 +29,22 @@ kubectl apply --server-side --field-manager=homelab -k k8s/infrastructure/metall
   kubectl apply --server-side --field-manager=homelab -k k8s/overlays/blackbox/metallb &&
   kubectl apply --server-side --field-manager=homelab -k k8s/overlays/blackbox/traefik
 ```
+
+## Pi-hole
+
+Pi-hole uses the host network to serve DNS over TCP and UDP at `192.168.1.200:53`. Its admin UI is available through Traefik at `http://pihole.home.stephenbolivar.com/admin/`.
+
+For a fresh cluster, create the `homelab` namespace and generate the admin password before applying the overlay. Run these commands from the repo root on `blackbox`.
+
+```sh
+kubectl apply --server-side --field-manager=homelab -f k8s/base/namespace.yaml
+od -An -N24 -tx1 /dev/urandom | tr -d '[:space:]' | \
+  kubectl -n homelab create secret generic pihole --from-file=web-password=/dev/stdin
+```
+
+Read the admin password from its Kubernetes Secret.
+
+```sh
+kubectl -n homelab get secret pihole -o jsonpath='{.data.web-password}' | base64 -d
+printf '\n'
+```
